@@ -18,8 +18,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package com.robut.markov;
 
+import java.util.HashMap;
+import java.util.ArrayList;
+
 import com.robut.markov.token.Token;
 
 public class MarkovChain<T> {
+    private ArrayList<Token<T>> initialTokenList = new ArrayList<>();
+
 
 }

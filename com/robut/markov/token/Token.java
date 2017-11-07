@@ -18,5 +18,9 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package com.robut.markov.token;
 
-public class Token {
+public class Token<T> {
+    private boolean isEnd = false;
+    private T data;
+
+
 }
