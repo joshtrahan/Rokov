@@ -32,6 +32,10 @@ public class TokenNode {
         this.count = count;
     }
 
+    public void addToCount(int toAdd){
+        this.count += toAdd;
+    }
+
     public Token getToken(){
         return this.token;
     }

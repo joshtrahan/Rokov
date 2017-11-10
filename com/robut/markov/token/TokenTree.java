@@ -20,11 +20,14 @@ package com.robut.markov.token;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
-public class TokenTree<T> {
+public class TokenTree {
     // Complete Binary Tree implemented with ArrayList
     private ArrayList<TokenNode> tokenTree = new ArrayList<>();
-    private HashMap<T, Integer> indexMap = new HashMap<>();
+    private HashMap<String, Integer> indexMap = new HashMap<>();
+
+    private Random random = new Random();
 
     TokenTree(Token token){
         addToken(token);
@@ -32,13 +35,43 @@ public class TokenTree<T> {
 
     TokenTree(){}
 
-    public void addValue(T value){
-        Token<T> newToken = new Token<>(value);
+    public Token getRandomValue(){
+        int randomValue = random.nextInt(getRootCount()) + 1;
+        int currentIndex = 0;
+
+        while (randomValue > 0){
+            int leftChildCount = tokenTree.get(calcLeftChild(currentIndex)).getCount();
+
+            if (randomValue <= leftChildCount){
+                currentIndex = calcLeftChild(currentIndex);
+            }
+            else{
+                currentIndex = calcRightChild(currentIndex);
+                randomValue -= leftChildCount;
+            }
+        }
+
+        return tokenTree.get(currentIndex).getToken();
+    }
+
+    public void addValue(String value){
+        if (indexMap.containsKey(value)){
+            updateTokenValue(indexMap.get(value));
+        }
+        Token newToken = new Token(value);
+        addToken(newToken);
+    }
+
+    public void updateTokenValue(int valueIndex){
+        for (; valueIndex >= 0; valueIndex = (valueIndex - 1) / 2){
+            tokenTree.get(valueIndex).addToCount(1);
+        }
     }
 
     public void addToken(Token token){
         int tokenPosition = tokenTree.size();
         this.tokenTree.add(new TokenNode(token));
+        indexMap.put(token.getValue(), tokenPosition);
 
         if (tokenPosition > 0){
             int tokenParentIndex = (tokenPosition - 1) / 2;
@@ -47,9 +80,26 @@ public class TokenTree<T> {
             // Move previous parent to be new token's sibling
             this.tokenTree.add(tokenSibling);
 
-            // Update new parent to have no value and reflect
+            // Replace parent with a blank count tracking node
             this.tokenTree.set(tokenParentIndex, new TokenNode(tokenSibling.getCount() + 1));
+
+            // Update sibling's entry in indexMap
             indexMap.put(tokenSibling.getToken().getValue(), tokenPosition + 1);
+
+            // Add 1 all the way up to the root
+            updateTokenValue(tokenParentIndex);
         }
+    }
+
+    public int getRootCount(){
+        return tokenTree.get(0).getCount();
+    }
+
+    private int calcLeftChild(int index){
+        return index * 2 + 1;
+    }
+
+    private int calcRightChild(int index){
+        return index * 2 + 2;
     }
 }

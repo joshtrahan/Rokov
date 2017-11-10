@@ -18,15 +18,15 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package com.robut.markov.token;
 
-public class Token<T> {
+public class Token {
     private boolean isEnd = false;
-    private T value;
+    private String value;
 
-    Token(T value){
+    Token(String value){
         this.value = value;
     }
 
-    public T getValue(){
+    public String getValue(){
         return this.value;
     }
 
