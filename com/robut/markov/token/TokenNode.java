@@ -24,7 +24,7 @@ public class TokenNode {
 
     TokenNode(Token token){
         this.token = token;
-        this.count = 1;
+        this.count = 0;
     }
 
     TokenNode(int count){

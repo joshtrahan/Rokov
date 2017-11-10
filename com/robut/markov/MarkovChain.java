@@ -18,12 +18,52 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 package com.robut.markov;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.lang.StringBuilder;
 
 import com.robut.markov.token.Token;
+import com.robut.markov.token.TokenTree;
 
-public class MarkovChain<T> {
-    private ArrayList<Token> initialTokenList = new ArrayList<>();
+public class MarkovChain {
+    private TokenTree startTree = new TokenTree();
+    private HashMap<String, TokenTree> tokenTreeMap = new HashMap<>();
+    private String lastValue;
 
+    public MarkovChain(){
 
+    }
+
+    public void addToken(Token token){
+        if (!this.tokenTreeMap.containsKey(token.getValue())) {
+            this.tokenTreeMap.put(token.getValue(), new TokenTree());
+        }
+
+        if (this.lastValue == null) {
+            this.startTree.addToken(token);
+        }
+        else{
+            this.tokenTreeMap.get(lastValue).addToken(token);
+        }
+        this.lastValue = token.getValue();
+    }
+
+    public void parseString(String toParse){
+        for (String word : toParse.split(" ")){
+            Token newToken = new Token(word);
+            this.addToken(newToken);
+        }
+        Token newToken = new Token(null);
+        this.addToken(newToken);
+    }
+
+    public String generateString(){
+        StringBuilder partialString = new StringBuilder();
+        Token currentToken = startTree.getRandomValue();
+
+        for (; !currentToken.isEnd(); currentToken = tokenTreeMap.get(currentToken).getRandomValue()){
+            partialString.append(currentToken.getValue() + " ");
+        }
+
+        return partialString.toString();
+    }
 }

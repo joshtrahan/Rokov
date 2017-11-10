@@ -29,11 +29,7 @@ public class TokenTree {
 
     private Random random = new Random();
 
-    TokenTree(Token token){
-        addToken(token);
-    }
-
-    TokenTree(){}
+    public TokenTree(){}
 
     public Token getRandomValue(){
         int randomValue = random.nextInt(getRootCount()) + 1;
@@ -54,21 +50,24 @@ public class TokenTree {
         return tokenTree.get(currentIndex).getToken();
     }
 
-    public void addValue(String value){
-        if (indexMap.containsKey(value)){
-            updateTokenValue(indexMap.get(value));
-        }
-        Token newToken = new Token(value);
-        addToken(newToken);
-    }
-
-    public void updateTokenValue(int valueIndex){
-        for (; valueIndex >= 0; valueIndex = (valueIndex - 1) / 2){
-            tokenTree.get(valueIndex).addToCount(1);
-        }
-    }
-
     public void addToken(Token token){
+        if (this.indexMap.containsKey(token.getValue())) {
+            this.updateTreeValues(this.indexMap.get(token.getValue()));
+        }
+        else {
+            this.addTokenToTree(token);
+        }
+    }
+
+    private void updateTreeValues(int valueIndex){
+        while (valueIndex > 0){
+            tokenTree.get(valueIndex).addToCount(1);
+            valueIndex = (valueIndex - 1) / 2;
+        }
+        tokenTree.get(valueIndex).addToCount(1);
+    }
+
+    private void addTokenToTree(Token token){
         int tokenPosition = tokenTree.size();
         this.tokenTree.add(new TokenNode(token));
         indexMap.put(token.getValue(), tokenPosition);
@@ -81,17 +80,16 @@ public class TokenTree {
             this.tokenTree.add(tokenSibling);
 
             // Replace parent with a blank count tracking node
-            this.tokenTree.set(tokenParentIndex, new TokenNode(tokenSibling.getCount() + 1));
+            this.tokenTree.set(tokenParentIndex, new TokenNode(tokenSibling.getCount()));
 
             // Update sibling's entry in indexMap
             indexMap.put(tokenSibling.getToken().getValue(), tokenPosition + 1);
-
-            // Add 1 all the way up to the root
-            updateTokenValue(tokenParentIndex);
         }
+        // Add 1 all the way up to the root
+        updateTreeValues(tokenPosition);
     }
 
-    public int getRootCount(){
+    private int getRootCount(){
         return tokenTree.get(0).getCount();
     }
 
