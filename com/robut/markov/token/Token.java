@@ -20,7 +20,17 @@ package com.robut.markov.token;
 
 public class Token<T> {
     private boolean isEnd = false;
-    private T data;
+    private T value;
 
+    Token(T value){
+        this.value = value;
+    }
 
+    public T getValue(){
+        return this.value;
+    }
+
+    public boolean isEnd() {
+        return isEnd;
+    }
 }
