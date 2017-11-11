@@ -61,7 +61,8 @@ public class MarkovChain {
         Token currentToken = startTree.getRandomValue();
 
         for (; !currentToken.isEnd(); currentToken = this.tokenTreeMap.get(currentToken.getValue()).getRandomValue()){
-            partialString.append(currentToken.getValue() + " ");
+            partialString.append(currentToken.getValue());
+            partialString.append(' ');
         }
 
         return partialString.toString();

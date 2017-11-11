@@ -16,9 +16,9 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robut.markov;
+import com.robut.markov.MarkovChain;
 
-class Main {
+class MarkovTest {
     public static void main(String[] args){
         MarkovChain markov = new MarkovChain();
 
@@ -26,8 +26,12 @@ class Main {
 
         markov.parseString(testString);
 
+        long startTime = System.nanoTime();
         for (int i = 0; i < 1000000; i++){
             markov.generateString();
         }
+        long endTime = System.nanoTime();
+
+        System.out.printf("Time in seconds: %f%n", (endTime - startTime) / 1e9);
     }
 }
