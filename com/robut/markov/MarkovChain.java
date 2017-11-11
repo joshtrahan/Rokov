@@ -33,7 +33,7 @@ public class MarkovChain {
 
     }
 
-    public void addToken(Token token){
+    private void addToken(Token token){
         if (!this.tokenTreeMap.containsKey(token.getValue())) {
             this.tokenTreeMap.put(token.getValue(), new TokenTree());
         }
@@ -48,8 +48,8 @@ public class MarkovChain {
     }
 
     public void parseString(String toParse){
-        for (String word : toParse.split(" ")){
-            Token newToken = new Token(word);
+        for (String word : toParse.split("\\s")){
+            Token newToken = new Token(word.replaceAll("\\s+", ""));
             this.addToken(newToken);
         }
         Token newToken = new Token(null);
