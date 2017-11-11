@@ -18,9 +18,7 @@
 
 package com.robut.markov;
 
-import com.robut.markov.MarkovChain;
-
-public class Main {
+class Main {
     public static void main(String[] args){
         MarkovChain markov = new MarkovChain();
 
@@ -28,6 +26,8 @@ public class Main {
 
         markov.parseString(testString);
 
-        System.out.println(markov.generateString());
+        for (int i = 0; i < 1000000; i++){
+            markov.generateString();
+        }
     }
 }

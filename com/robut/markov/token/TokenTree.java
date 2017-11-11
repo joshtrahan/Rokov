@@ -35,7 +35,7 @@ public class TokenTree {
         int randomValue = random.nextInt(getRootCount()) + 1;
         int currentIndex = 0;
 
-        while (randomValue > 0){
+        while (randomValue > 0 && tokenTree.get(currentIndex).getToken() == null){
             int leftChildCount = tokenTree.get(calcLeftChild(currentIndex)).getCount();
 
             if (randomValue <= leftChildCount){

@@ -60,7 +60,7 @@ public class MarkovChain {
         StringBuilder partialString = new StringBuilder();
         Token currentToken = startTree.getRandomValue();
 
-        for (; !currentToken.isEnd(); currentToken = tokenTreeMap.get(currentToken).getRandomValue()){
+        for (; !currentToken.isEnd(); currentToken = this.tokenTreeMap.get(currentToken.getValue()).getRandomValue()){
             partialString.append(currentToken.getValue() + " ");
         }
 
