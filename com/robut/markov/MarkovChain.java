@@ -49,7 +49,7 @@ public class MarkovChain {
 
     public void parseString(String toParse) {
         if (!toParse.matches("\\s+")) {
-            for (String word : toParse.split("\\s")) {
+            for (String word : toParse.split("\\s+")) {
                 this.addWord(word);
             }
             this.endString();
@@ -57,7 +57,7 @@ public class MarkovChain {
     }
 
     public void addWord(String word){
-        Token newToken = new Token(word.replaceAll("\\s+", ""));
+        Token newToken = new Token(word);
         this.addToken(newToken);
     }
 

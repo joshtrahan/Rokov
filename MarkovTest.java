@@ -41,10 +41,10 @@ class MarkovTest {
             System.out.printf("Exception: %s%n", e);
         }
 
-        for (String input : testString.toString().split("\n")) {
+        for (String input : testString.toString().split("\r\n\r\n")) {
             markov.parseString(input);
         }
-        
+
         long startTime = System.nanoTime();
         for (int i = 0; i < 10; i++){
             System.out.println(markov.generateString());
