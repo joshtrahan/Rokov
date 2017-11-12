@@ -25,6 +25,8 @@ import java.util.Random;
 public class TokenTree {
     // Complete Binary Tree implemented with ArrayList
     private ArrayList<TokenNode> tokenTree = new ArrayList<>();
+
+    // Keep track of which index each string is at
     private HashMap<String, Integer> indexMap = new HashMap<>();
 
     private Random random = new Random();

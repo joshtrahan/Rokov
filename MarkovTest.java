@@ -28,7 +28,7 @@ class MarkovTest {
         StringBuilder testString = new StringBuilder();
 
         try{
-            BufferedReader br = new BufferedReader(new FileReader("LICENSE"));
+            BufferedReader br = new BufferedReader(new FileReader("./resources/test_str.txt"));
 
             String contentLine = br.readLine();
             while (contentLine != null){
@@ -38,14 +38,16 @@ class MarkovTest {
             }
         }
         catch (Exception e){
-            System.out.printf("caught some exception garbo: %s%n", e);
+            System.out.printf("Exception: %s%n", e);
         }
 
-        markov.parseString(testString.toString());
-
+        for (String input : testString.toString().split("\n")) {
+            markov.parseString(input);
+        }
+        
         long startTime = System.nanoTime();
         for (int i = 0; i < 10; i++){
-            markov.generateString();
+            System.out.println(markov.generateString());
         }
         long endTime = System.nanoTime();
 

@@ -47,11 +47,21 @@ public class MarkovChain {
         this.lastValue = token.getValue();
     }
 
-    public void parseString(String toParse){
-        for (String word : toParse.split("\\s")){
-            Token newToken = new Token(word.replaceAll("\\s+", ""));
-            this.addToken(newToken);
+    public void parseString(String toParse) {
+        if (!toParse.matches("\\s+")) {
+            for (String word : toParse.split("\\s")) {
+                this.addWord(word);
+            }
+            this.endString();
         }
+    }
+
+    public void addWord(String word){
+        Token newToken = new Token(word.replaceAll("\\s+", ""));
+        this.addToken(newToken);
+    }
+
+    public void endString(){
         Token newToken = new Token(null);
         this.addToken(newToken);
     }
