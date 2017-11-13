@@ -58,6 +58,5 @@ class MarkovTest {
         }
         endTime = System.nanoTime();
         System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 10e9);
-        System.out.printf("Time: %f%n", System.nanoTime() / 10e9);
     }
 }
