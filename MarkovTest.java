@@ -27,6 +27,7 @@ class MarkovTest {
 
         StringBuilder testString = new StringBuilder();
 
+        long startTime = System.nanoTime();
         try{
             BufferedReader br = new BufferedReader(new FileReader("./resources/test_str.txt"));
 
@@ -40,17 +41,23 @@ class MarkovTest {
         catch (Exception e){
             System.out.printf("Exception: %s%n", e);
         }
+        long endTime = System.nanoTime();
+        System.out.printf("Read time: %f%n", (endTime - startTime) / 10e9);
 
+        startTime = System.nanoTime();
         for (String input : testString.toString().split("\r\n\r\n")) {
             markov.parseString(input);
         }
+        endTime = System.nanoTime();
+        System.out.printf("Load time: %f%n", (endTime - startTime) / 10e9);
 
-        long startTime = System.nanoTime();
-        for (int i = 0; i < 10; i++){
-            System.out.println(markov.generateString());
+        startTime = System.nanoTime();
+        int repetitions = 10;
+        for (int i = 0; i < repetitions; i++){
+            markov.generateString();
         }
-        long endTime = System.nanoTime();
-
-        System.out.printf("Time in seconds: %f%n", (endTime - startTime) / 1e9);
+        endTime = System.nanoTime();
+        System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 10e9);
+        System.out.printf("Time: %f%n", System.nanoTime() / 10e9);
     }
 }

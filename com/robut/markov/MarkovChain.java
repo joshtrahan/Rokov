@@ -27,6 +27,7 @@ import com.robut.markov.token.TokenTree;
 public class MarkovChain {
     private TokenTree startTree = new TokenTree();
     private HashMap<String, TokenTree> tokenTreeMap = new HashMap<>();
+
     private String lastValue;
 
     public MarkovChain(){
