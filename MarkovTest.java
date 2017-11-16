@@ -34,7 +34,7 @@ class MarkovTest {
             String contentLine = br.readLine();
             while (contentLine != null){
                 testString.append(contentLine);
-                testString.append("\r\n");
+                testString.append("\n");
                 contentLine = br.readLine();
             }
         }
@@ -45,8 +45,9 @@ class MarkovTest {
         System.out.printf("Read time: %f%n", (endTime - startTime) / 10e9);
 
         startTime = System.nanoTime();
-        for (String input : testString.toString().split("\r\n\r\n")) {
-            markov.parseString(input);
+        for (String paragraph : testString.toString().split("\n"))
+        {
+            markov.parseString(paragraph);
         }
         endTime = System.nanoTime();
         System.out.printf("Load time: %f%n", (endTime - startTime) / 10e9);
