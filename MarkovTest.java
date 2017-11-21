@@ -33,8 +33,10 @@ class MarkovTest {
 
             String contentLine = br.readLine();
             while (contentLine != null){
-                testString.append(contentLine);
-                testString.append("\n");
+                if (contentLine.length() != 0 && !contentLine.matches("\\s+")) {
+                    testString.append(contentLine);
+                    testString.append("\n");
+                }
                 contentLine = br.readLine();
             }
         }
