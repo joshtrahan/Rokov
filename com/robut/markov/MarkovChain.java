@@ -34,17 +34,21 @@ public class MarkovChain {
 
     }
 
-    private void addToken(Token token){
+    private void addToken(Token token, String lastWord){
         if (!this.tokenTreeMap.containsKey(token.getValue())) {
             this.tokenTreeMap.put(token.getValue(), new TokenTree());
         }
 
-        if (this.lastValue == null) {
+        if (lastWord == null) {
             this.startTree.addToken(token);
         }
         else{
-            this.tokenTreeMap.get(lastValue).addToken(token);
+            this.tokenTreeMap.get(lastWord).addToken(token);
         }
+    }
+
+    private void addToken(Token token){
+        addToken(token, this.lastValue);
         this.lastValue = token.getValue();
     }
 
