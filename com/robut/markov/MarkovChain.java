@@ -34,24 +34,6 @@ public class MarkovChain {
 
     }
 
-    private void addToken(Token token, String lastWord){
-        if (!this.tokenTreeMap.containsKey(token.getValue())) {
-            this.tokenTreeMap.put(token.getValue(), new TokenTree());
-        }
-
-        if (lastWord == null) {
-            this.startTree.addToken(token);
-        }
-        else{
-            this.tokenTreeMap.get(lastWord).addToken(token);
-        }
-    }
-
-    private void addToken(Token token){
-        addToken(token, this.lastValue);
-        this.lastValue = token.getValue();
-    }
-
     public void parseString(String toParse) {
         if (!toParse.matches("\\s+")) {
             for (String word : toParse.split("\\s+")) {
@@ -82,4 +64,23 @@ public class MarkovChain {
 
         return partialString.toString();
     }
+
+    private void addToken(Token token, String lastWord){
+        if (!this.tokenTreeMap.containsKey(token.getValue())) {
+            this.tokenTreeMap.put(token.getValue(), new TokenTree());
+        }
+
+        if (lastWord == null) {
+            this.startTree.addToken(token);
+        }
+        else{
+            this.tokenTreeMap.get(lastWord).addToken(token);
+        }
+    }
+
+    private void addToken(Token token){
+        addToken(token, this.lastValue);
+        this.lastValue = token.getValue();
+    }
+
 }
