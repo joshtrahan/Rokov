@@ -72,6 +72,8 @@ public class MarkovChain {
             this.tokenTreeMap.put(token.getValue(), new TokenTree());
         }
 
+        logger.addItem(token.getValue(), lastWord);
+
         if (lastWord == null) {
             this.startTree.addToken(token);
         }
