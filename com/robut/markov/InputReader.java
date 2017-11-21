@@ -16,7 +16,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.robut.markov.MarkovChain;
+package com.robut.markov;
 
 import java.util.Scanner;
 

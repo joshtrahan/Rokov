@@ -61,12 +61,16 @@ public class TokenTree {
         }
     }
 
-    private void updateTreeValues(int valueIndex){
+    private void updateTreeValues(int valueIndex, int toAdd){
         while (valueIndex > 0){
-            tokenTree.get(valueIndex).addToCount(1);
+            tokenTree.get(valueIndex).addToCount(toAdd);
             valueIndex = (valueIndex - 1) / 2;
         }
-        tokenTree.get(valueIndex).addToCount(1);
+        tokenTree.get(valueIndex).addToCount(toAdd);
+    }
+
+    private void updateTreeValues(int valueIndex){
+        updateTreeValues(valueIndex, 1);
     }
 
     private void addTokenToTree(Token token){
