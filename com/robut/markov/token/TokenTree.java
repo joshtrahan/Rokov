@@ -52,13 +52,17 @@ public class TokenTree {
         return tokenTree.get(currentIndex).getToken();
     }
 
-    public void addToken(Token token){
+    public void addToken(Token token, int count){
         if (this.indexMap.containsKey(token.getValue())) {
             this.updateTreeValues(this.indexMap.get(token.getValue()));
         }
         else {
-            this.addTokenToTree(token);
+            this.addTokenToTree(token, count);
         }
+    }
+
+    public void addToken(Token token){
+        addToken(token, 1);
     }
 
     private void updateTreeValues(int valueIndex, int toAdd){
@@ -73,7 +77,7 @@ public class TokenTree {
         updateTreeValues(valueIndex, 1);
     }
 
-    private void addTokenToTree(Token token){
+    private void addTokenToTree(Token token, int count){
         int tokenPosition = tokenTree.size();
         this.tokenTree.add(new TokenNode(token));
         indexMap.put(token.getValue(), tokenPosition);
