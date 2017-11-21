@@ -54,7 +54,7 @@ public class TokenTree {
 
     public void addToken(Token token, int count){
         if (this.indexMap.containsKey(token.getValue())) {
-            this.updateTreeValues(this.indexMap.get(token.getValue()));
+            this.updateTreeValues(this.indexMap.get(token.getValue()), count);
         }
         else {
             this.addTokenToTree(token, count);
@@ -66,6 +66,7 @@ public class TokenTree {
     }
 
     private void updateTreeValues(int valueIndex, int toAdd){
+        // can probably make this a do while loop to look cleaner
         while (valueIndex > 0){
             tokenTree.get(valueIndex).addToCount(toAdd);
             valueIndex = (valueIndex - 1) / 2;

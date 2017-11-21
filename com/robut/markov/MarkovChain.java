@@ -28,6 +28,8 @@ public class MarkovChain {
     private TokenTree startTree = new TokenTree();
     private HashMap<String, TokenTree> tokenTreeMap = new HashMap<>();
 
+    private DataLogger logger = new DataLogger();
+
     private String lastValue;
 
     public MarkovChain(){
