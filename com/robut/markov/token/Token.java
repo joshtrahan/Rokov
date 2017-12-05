@@ -33,6 +33,10 @@ public class Token {
         return this.value;
     }
 
+    public void setValue(String newValue){
+        this.value = newValue;
+    }
+
     public boolean isEnd() {
         return isEnd;
     }
