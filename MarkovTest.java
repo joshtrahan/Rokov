@@ -17,12 +17,25 @@
  */
 
 import com.robut.markov.MarkovChain;
+import com.robut.markov.SQLiteConnection;
 
 import java.io.*;
 import java.lang.StringBuilder;
 
 class MarkovTest {
     public static void main(String[] args){
+        // testChainGen();
+
+        testDBGen();
+    }
+
+    public static void testDBGen(){
+        SQLiteConnection connection = new SQLiteConnection("./resources/chain.db");
+
+
+    }
+
+    public static void testChainGen(){
         MarkovChain markov = new MarkovChain();
 
         StringBuilder testString = new StringBuilder();
