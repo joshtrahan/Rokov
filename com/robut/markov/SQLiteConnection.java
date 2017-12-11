@@ -1,9 +1,10 @@
 package com.robut.markov;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.DatabaseMetaData;
+import java.sql.Statement;
 import java.sql.SQLException;
 
 public class SQLiteConnection {
@@ -18,12 +19,19 @@ public class SQLiteConnection {
         try {
             this.url = this.SQLITE_PREFIX + this.filepath.getCanonicalPath();
         }
-        catch (Exception e){
+        catch (IOException e){
             System.err.printf("Error connecting to file at %s: %s%n", filepath, e);
         }
 
         if (!this.filepath.exists()) {
             createDB();
+        }
+
+        try{
+            createTables();
+        }
+        catch (SQLException e){
+            System.err.printf("Error creating tables: ");
         }
     }
 
@@ -37,7 +45,7 @@ public class SQLiteConnection {
         }
     }
 
-    private void createTables(){
+    private void createTables() throws SQLException{
         String createIdMapSql = "CREATE TABLE IF NOT EXISTS WordIDs (\n" +
                 "id integer PRIMARY KEY NOT NULL, \n" +
                 "word text \n" +
@@ -45,8 +53,13 @@ public class SQLiteConnection {
 
         String createWordRelationSql = "CREATE TABLE IF NOT EXISTS WordRelations (\n" +
                 "preID integer NOT NULL, \n" +
-                "postID integer NOT NULL \n" +
+                "postID integer NOT NULL, \n" +
+                "PRIMARY KEY(preID, postID) \n" +
                 ");";
+
+        Statement statement = this.connection.createStatement();
+        statement.execute(createIdMapSql);
+        statement.execute(createWordRelationSql);
     }
 
     private void connectDB(){
@@ -54,7 +67,7 @@ public class SQLiteConnection {
             this.connection = DriverManager.getConnection(this.url);
             System.out.printf("Connected to database at: %s%n", this.url);
         }
-        catch (Exception e){
+        catch (SQLException e){
             System.err.printf("Error connecting to database: %s%n", e);
         }
     }
