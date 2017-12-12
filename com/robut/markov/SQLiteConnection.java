@@ -62,18 +62,22 @@ public class SQLiteConnection {
 
     public void saveLogItems(ArrayList<LogItem> items) throws SQLException{
         this.conn.setAutoCommit(false);
-        PreparedStatement prepStatement = this.conn.prepareStatement("INSERT INTO WordRelations (preID, postID, count) VALUES (?, ?, ?)");
+        PreparedStatement insertStatement = this.conn.prepareStatement("INSERT INTO WordRelations (preID, postID, count) VALUES (?, ?, ?)");
+        PreparedStatement updateStatement = this.conn.prepareStatement("UPDATE WordRelations \n" +
+                "SET count = ? \n" +
+                "WHERE preID = ? AND postID = ?");
 
         for (LogItem item : items){
-            addLogItemToBatch(item.getPredecessor(), item.getSuccessor(), item.getCount(), prepStatement);
+            addLogItemToBatch(item.getPredecessor(), item.getSuccessor(), item.getCount(), insertStatement, updateStatement);
         }
 
-        prepStatement.executeBatch();
+        insertStatement.executeBatch();
+        updateStatement.executeBatch();
         this.conn.commit();
         this.conn.setAutoCommit(true);
     }
 
-    private void addLogItemToBatch(String pre, String post, int count, PreparedStatement prepStatement) throws SQLException{
+    private void addLogItemToBatch(String pre, String post, int count, PreparedStatement insertStatement, PreparedStatement updateStatement) throws SQLException{
         int preID;
         int postID;
 
@@ -96,16 +100,19 @@ public class SQLiteConnection {
         }
         if (!this.relationMap.get(preID).containsKey(postID)){
             this.relationMap.get(preID).put(postID, count);
+            insertStatement.setInt(1, preID);
+            insertStatement.setInt(2, postID);
+            insertStatement.setInt(3, count);
+            insertStatement.addBatch();
         }
         else{
             count = count + this.relationMap.get(preID).get(postID);
             this.relationMap.get(preID).put(postID, count);
+            updateStatement.setInt(1, count);
+            updateStatement.setInt(2, preID);
+            updateStatement.setInt(3, postID);
+            updateStatement.addBatch();
         }
-
-        prepStatement.setInt(1, preID);
-        prepStatement.setInt(2, postID);
-        prepStatement.setInt(3, count);
-        prepStatement.addBatch();
     }
 
     private void createDB() throws SQLException{

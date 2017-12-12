@@ -74,7 +74,7 @@ class MarkovTest {
         startTime = System.nanoTime();
         int repetitions = 10;
         for (int i = 0; i < repetitions; i++){
-//            System.out.println(markov.generateString());
+            markov.generateString();
         }
         endTime = System.nanoTime();
         System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 10e9);
@@ -82,6 +82,6 @@ class MarkovTest {
         startTime = System.nanoTime();
         markov.saveToDisk();
         endTime = System.nanoTime();
-        System.out.printf("Time to save to disk: %d%n", (endTime - startTime) / 10e9);
+        System.out.printf("Time to save to disk: %f%n", (endTime - startTime) / 10e9);
     }
 }
