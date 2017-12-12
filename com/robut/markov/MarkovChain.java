@@ -39,12 +39,11 @@ public class MarkovChain {
     public void parseString(String toParse) {
         if (!toParse.matches("\\s+")) {
             for (String word : toParse.split("\\s+")) {
-                this.addWord(word);
+                this.addWord(word.replaceAll("\\s+", ""));
             }
             this.endString();
+//            logger.saveToDisk();
         }
-
-        logger.saveToDisk();
     }
 
     public void addWord(String word){
@@ -55,12 +54,31 @@ public class MarkovChain {
     private void addWord(String word, String last, int count){
         Token newToken = new Token(word.intern());
         this.addToken(newToken, last, count);
-        logger.addItem(last, word, count);
+    }
+
+    private void addToken(Token token, String lastWord, int count) {
+        if (!this.tokenTreeMap.containsKey(token.getValue())) {
+            this.tokenTreeMap.put(token.getValue(), new TokenTree());
+            logger.addWord(token.getValue());
+        }
+
+        if (lastWord == null) {
+            this.startTree.addToken(token);
+        }
+        else{
+            this.tokenTreeMap.get(lastWord).addToken(token);
+        }
+        logger.addItem(lastWord, token.getValue(), count);
+    }
+
+    private void addToken(Token token){
+        addToken(token, this.lastValue, 1);
     }
 
     public void endString(){
         Token newToken = new Token(null);
         this.addToken(newToken);
+        this.lastValue = null;
     }
 
     public String generateString(){
@@ -75,21 +93,7 @@ public class MarkovChain {
         return partialString.toString();
     }
 
-    private void addToken(Token token, String lastWord, int count) {
-        if (!this.tokenTreeMap.containsKey(token.getValue())) {
-            this.tokenTreeMap.put(token.getValue(), new TokenTree());
-        }
-
-        if (lastWord == null) {
-            this.startTree.addToken(token);
-        }
-        else{
-            this.tokenTreeMap.get(lastWord).addToken(token);
-        }
+    public void saveToDisk(){
+        logger.saveToDisk();
     }
-
-    private void addToken(Token token){
-        addToken(token, this.lastValue, 1);
-    }
-
 }

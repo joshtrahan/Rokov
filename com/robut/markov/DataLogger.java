@@ -4,7 +4,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class DataLogger {
-    private ArrayList<LogItem> logItems = new ArrayList<>();
+    private ArrayList<LogItem> newItems = new ArrayList<>();
+    private ArrayList<String> newWords = new ArrayList<>();
+
     private SQLiteConnection sqlConn;
 
     public DataLogger(){
@@ -17,28 +19,33 @@ public class DataLogger {
     }
 
     public void saveToDisk(){
-        for (LogItem item : logItems){
-            try {
-                sqlConn.saveLogItem(item.getPredecessor(), item.getSuccessor(), item.getCount());
-            }
-            catch (SQLException e){
-                System.err.printf("Error saving log item: %s | %s | %d %n%s%n", item.getPredecessor(), item.getSuccessor(),
-                        item.getCount(), e);
-            }
+        try {
+            sqlConn.saveWords(newWords);
+        }
+        catch(SQLException e){
+            System.err.printf("Error saving wordlist: %s%n", e);
         }
 
-        logItems.clear();
+        try{
+            sqlConn.saveLogItems(newItems);
+        }
+        catch(SQLException e){
+            System.err.printf("Error saving log items: %s%n", e);
+        }
+
+        newWords.clear();
+        newItems.clear();
     }
 
     public void addItem(String predecessor, String successor){
         addItem(predecessor, successor, 1);
     }
 
-    public void addItemStart(String successor){
-
+    public void addWord(String word){
+        newWords.add(word);
     }
 
     public void addItem(String predecessor, String successor, int count){
-        logItems.add(new LogItem(predecessor, successor, count));
+        newItems.add(new LogItem(predecessor, successor, count));
     }
 }

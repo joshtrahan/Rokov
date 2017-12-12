@@ -1,13 +1,14 @@
 package com.robut.markov;
 
-import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.Statement;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SQLiteConnection {
     private static final String SQLITE_PREFIX = "jdbc:sqlite:";
@@ -16,8 +17,9 @@ public class SQLiteConnection {
     private Connection conn;
 
     private HashMap<String, Integer> stringToIdMap = new HashMap<>();
-    private HashMap<Integer, String> idToStringMap = new HashMap<>();
     private int currentWordId = 2;
+
+    private HashMap<Integer, HashMap<Integer, Integer>> relationMap = new HashMap<>();
 
     public SQLiteConnection(String dbPath) throws SQLException{
         File filepath = new File(dbPath);
@@ -30,23 +32,48 @@ public class SQLiteConnection {
         }
 
         if (!filepath.exists()) {
+            this.conn = DriverManager.getConnection(this.url);
             createDB();
         }
     }
 
-    public void insertWord(String word) throws SQLException{
+    public void saveWords(ArrayList<String> words) throws SQLException {
+        this.conn.setAutoCommit(false);
         PreparedStatement prepStatement = this.conn.prepareStatement("INSERT INTO WordIDs (id, word) VALUES (?, ?)");
 
+        for (String word : words){
+            addWordToBatch(word, prepStatement);
+        }
+
+        prepStatement.executeBatch();
+        this.conn.commit();
+        this.conn.setAutoCommit(true);
+    }
+
+    private void addWordToBatch(String word, PreparedStatement prepStatement) throws SQLException{
         this.stringToIdMap.put(word, this.currentWordId);
 
         prepStatement.setInt(1, this.currentWordId);
         prepStatement.setString(2, word);
-        prepStatement.executeUpdate();
+        prepStatement.addBatch();
 
         this.currentWordId = this.currentWordId + 1;
     }
 
-    public void saveLogItem(String pre, String post, int count) throws SQLException{
+    public void saveLogItems(ArrayList<LogItem> items) throws SQLException{
+        this.conn.setAutoCommit(false);
+        PreparedStatement prepStatement = this.conn.prepareStatement("INSERT INTO WordRelations (preID, postID, count) VALUES (?, ?, ?)");
+
+        for (LogItem item : items){
+            addLogItemToBatch(item.getPredecessor(), item.getSuccessor(), item.getCount(), prepStatement);
+        }
+
+        prepStatement.executeBatch();
+        this.conn.commit();
+        this.conn.setAutoCommit(true);
+    }
+
+    private void addLogItemToBatch(String pre, String post, int count, PreparedStatement prepStatement) throws SQLException{
         int preID;
         int postID;
 
@@ -54,9 +81,6 @@ public class SQLiteConnection {
             preID = 0;
         }
         else{
-            if (!stringToIdMap.containsKey(pre)){
-                insertWord(pre);
-            }
             preID = stringToIdMap.get(pre);
         }
 
@@ -64,36 +88,36 @@ public class SQLiteConnection {
             postID = 1;
         }
         else{
-            if (!stringToIdMap.containsKey(post)){
-                insertWord(post);
-            }
             postID = stringToIdMap.get(post);
         }
 
-
-        if (!stringToIdMap.containsKey(post)){
-            insertWord(post);
+        if (!(this.relationMap.containsKey(preID))){
+            this.relationMap.put(preID, new HashMap<>());
+        }
+        if (!this.relationMap.get(preID).containsKey(postID)){
+            this.relationMap.get(preID).put(postID, count);
+        }
+        else{
+            count = count + this.relationMap.get(preID).get(postID);
+            this.relationMap.get(preID).put(postID, count);
         }
 
-        PreparedStatement prepStatement = this.conn.prepareStatement("INSERT INTO WordRelations (preID, postID, count) VALUES (?, ?, ?)");
         prepStatement.setInt(1, preID);
         prepStatement.setInt(2, postID);
         prepStatement.setInt(3, count);
-        prepStatement.execute();
-    }
-
-    public void saveLogItem(String pre, String post) throws SQLException{
-        saveLogItem(pre, post, 1);
+        prepStatement.addBatch();
     }
 
     private void createDB() throws SQLException{
-        System.out.printf("Created database at: %s%n", this.url);
+        System.out.printf("Created database file at: %s...%n", this.url);
 
         createTables();
 
-        System.out.printf("Created tables.%n");
+        System.out.printf("Created tables...%n");
 
         createStartEndIds();
+
+        System.out.printf("Created special word IDs...%n");
     }
 
     private void createStartEndIds() throws SQLException{
@@ -109,8 +133,6 @@ public class SQLiteConnection {
     }
 
     private void createTables() throws SQLException{
-        this.conn = DriverManager.getConnection(this.url);
-
         String createIdMapSql = "CREATE TABLE IF NOT EXISTS WordIDs (\n" +
                 "id integer PRIMARY KEY NOT NULL, \n" +
                 "word text \n" +

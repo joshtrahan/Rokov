@@ -50,8 +50,10 @@ class MarkovTest {
 
             String contentLine = br.readLine();
             while (contentLine != null){
-                testString.append(contentLine);
-                testString.append("\n");
+                if ( !(contentLine.matches("\\s+") || contentLine.matches("")) ) {
+                    testString.append(contentLine);
+                    testString.append("\n");
+                }
                 contentLine = br.readLine();
             }
         }
@@ -62,7 +64,7 @@ class MarkovTest {
         System.out.printf("Read time: %f%n", (endTime - startTime) / 10e9);
 
         startTime = System.nanoTime();
-        for (String paragraph : testString.toString().split("\n\n"))
+        for (String paragraph : testString.toString().split("\n"))
         {
             markov.parseString(paragraph);
         }
@@ -72,9 +74,14 @@ class MarkovTest {
         startTime = System.nanoTime();
         int repetitions = 10;
         for (int i = 0; i < repetitions; i++){
-            System.out.println(markov.generateString());
+//            System.out.println(markov.generateString());
         }
         endTime = System.nanoTime();
         System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 10e9);
+
+        startTime = System.nanoTime();
+        markov.saveToDisk();
+        endTime = System.nanoTime();
+        System.out.printf("Time to save to disk: %d%n", (endTime - startTime) / 10e9);
     }
 }
