@@ -49,6 +49,7 @@ public class MarkovChain {
 
     public void addWord(String word){
         addWord(word, this.lastValue, 1);
+        this.lastValue = word;
     }
 
     private void addWord(String word, String last, int count){
@@ -89,7 +90,6 @@ public class MarkovChain {
 
     private void addToken(Token token){
         addToken(token, this.lastValue, 1);
-        this.lastValue = token.getValue();
     }
 
 }
