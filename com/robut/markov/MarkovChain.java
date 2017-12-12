@@ -27,7 +27,6 @@ import com.robut.markov.token.TokenTree;
 public class MarkovChain {
     private TokenTree startTree = new TokenTree();
     private HashMap<String, TokenTree> tokenTreeMap = new HashMap<>();
-    private HashMap<String, String> stringDeduplicator = new HashMap();
 
     private String lastValue;
 
@@ -45,7 +44,7 @@ public class MarkovChain {
     }
 
     public void addWord(String word){
-        Token newToken = new Token(word);
+        Token newToken = new Token(word.intern());
         this.addToken(newToken);
     }
 
@@ -67,13 +66,6 @@ public class MarkovChain {
     }
 
     private void addToken(Token token, String lastWord) {
-        if (!this.stringDeduplicator.containsKey(token.getValue())) {
-            this.stringDeduplicator.put(token.getValue(), token.getValue());
-        }
-        else{
-            token.setValue(this.stringDeduplicator.get(token.getValue()));
-        }
-
         if (!this.tokenTreeMap.containsKey(token.getValue())) {
             this.tokenTreeMap.put(token.getValue(), new TokenTree());
         }

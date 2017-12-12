@@ -29,14 +29,12 @@ class MarkovTest {
 
         long startTime = System.nanoTime();
         try{
-            BufferedReader br = new BufferedReader(new FileReader("./resources/test_str.txt"));
+            BufferedReader br = new BufferedReader(new FileReader("./resources/prideandprejudice.txt"));
 
             String contentLine = br.readLine();
             while (contentLine != null){
-                if (contentLine.length() != 0 && !contentLine.matches("\\s+")) {
-                    testString.append(contentLine);
-                    testString.append("\n");
-                }
+                testString.append(contentLine);
+                testString.append("\n");
                 contentLine = br.readLine();
             }
         }
@@ -47,7 +45,7 @@ class MarkovTest {
         System.out.printf("Read time: %f%n", (endTime - startTime) / 10e9);
 
         startTime = System.nanoTime();
-        for (String paragraph : testString.toString().split("\n"))
+        for (String paragraph : testString.toString().split("\n\n"))
         {
             markov.parseString(paragraph);
         }

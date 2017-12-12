@@ -23,9 +23,11 @@ public class Token {
     private String value;
 
     public Token(String value){
-        this.value = value;
         if (value == null){
             isEnd = true;
+        }
+        else{
+            setValue(value);
         }
     }
 
