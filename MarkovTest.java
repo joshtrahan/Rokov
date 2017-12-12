@@ -21,18 +21,22 @@ import com.robut.markov.SQLiteConnection;
 
 import java.io.*;
 import java.lang.StringBuilder;
+import java.sql.SQLException;
 
 class MarkovTest {
     public static void main(String[] args){
-        // testChainGen();
+        testChainGen();
 
-        testDBGen();
+//        testDBGen();
     }
 
     public static void testDBGen(){
-        SQLiteConnection connection = new SQLiteConnection("./resources/chain.db");
-
-
+        try {
+            SQLiteConnection connection = new SQLiteConnection("./resources/chain.db");
+        }
+        catch (SQLException e){
+            System.out.printf("SQL Error: %s%n", e);
+        }
     }
 
     public static void testChainGen(){

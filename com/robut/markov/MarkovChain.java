@@ -43,11 +43,18 @@ public class MarkovChain {
             }
             this.endString();
         }
+
+        logger.saveToDisk();
     }
 
     public void addWord(String word){
+        addWord(word, this.lastValue, 1);
+    }
+
+    private void addWord(String word, String last, int count){
         Token newToken = new Token(word.intern());
-        this.addToken(newToken);
+        this.addToken(newToken, last, count);
+        logger.addItem(last, word, count);
     }
 
     public void endString(){
@@ -67,12 +74,10 @@ public class MarkovChain {
         return partialString.toString();
     }
 
-    private void addToken(Token token, String lastWord) {
+    private void addToken(Token token, String lastWord, int count) {
         if (!this.tokenTreeMap.containsKey(token.getValue())) {
             this.tokenTreeMap.put(token.getValue(), new TokenTree());
         }
-
-        logger.addItem(token.getValue(), lastWord);
 
         if (lastWord == null) {
             this.startTree.addToken(token);
@@ -83,7 +88,7 @@ public class MarkovChain {
     }
 
     private void addToken(Token token){
-        addToken(token, this.lastValue);
+        addToken(token, this.lastValue, 1);
         this.lastValue = token.getValue();
     }
 

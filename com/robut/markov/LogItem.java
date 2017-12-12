@@ -16,4 +16,14 @@ public class LogItem {
         this.successor = newSuccessor;
         this.count = 1;
     }
+
+    public String getPredecessor(){
+        return this.predecessor;
+    }
+    public String getSuccessor(){
+        return this.successor;
+    }
+    public int getCount(){
+        return this.count;
+    }
 }
