@@ -9,9 +9,9 @@ public class DataLogger {
 
     private SQLiteConnection sqlConn;
 
-    public DataLogger(){
+    public DataLogger(String dbPath){
         try{
-            this.sqlConn = new SQLiteConnection("./resources/chain.db");
+            this.sqlConn = new SQLiteConnection(dbPath);
         }
         catch (SQLException e){
             System.err.printf("Error creating database: %s%n", e);

@@ -28,11 +28,17 @@ public class MarkovChain {
     private TokenTree startTree = new TokenTree();
     private HashMap<String, TokenTree> tokenTreeMap = new HashMap<>();
 
-    private DataLogger logger = new DataLogger();
+    private DataLogger logger;
 
     private String lastValue;
 
     public MarkovChain(){
+
+    }
+
+    public MarkovChain(String dbPath){
+        logger = new DataLogger(dbPath);
+
         loadFromDisk();
     }
 
@@ -62,7 +68,9 @@ public class MarkovChain {
         if (!this.tokenTreeMap.containsKey(token.getValue())) {
             this.tokenTreeMap.put(token.getValue(), new TokenTree());
             if (!token.isEnd()) {
-                logger.addWord(token.getValue());
+                if (logger != null) {
+                    logger.addWord(token.getValue());
+                }
             }
         }
 
@@ -72,7 +80,9 @@ public class MarkovChain {
         else{
             this.tokenTreeMap.get(lastWord).addToken(token, count);
         }
-        logger.addItem(lastWord, token.getValue(), count);
+        if (logger != null) {
+            logger.addItem(lastWord, token.getValue(), count);
+        }
     }
 
     private void addToken(Token token){
@@ -98,12 +108,23 @@ public class MarkovChain {
     }
 
     private void loadFromDisk(){
-        for (LogItem item : logger.loadLogItems()){
-            addWord(item.getSuccessor(), item.getPredecessor(), item.getCount());
+        if (logger != null) {
+            for (LogItem item : logger.loadLogItems()) {
+                addWord(item.getSuccessor(), item.getPredecessor(), item.getCount());
+            }
         }
+        else{
+            System.err.printf("Error: Can't load from disk; no database path specified.%n");
+        }
+
     }
 
     public void saveToDisk(){
-        logger.saveToDisk();
+        if (logger != null) {
+            logger.saveToDisk();
+        }
+        else{
+            System.err.printf("Error: Can't save to disk; no database path specified.%n");
+        }
     }
 }

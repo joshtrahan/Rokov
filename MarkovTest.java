@@ -25,13 +25,22 @@ import java.sql.SQLException;
 
 class MarkovTest {
     public static void main(String[] args){
-//        testChainGen();
-        testDBLoad();
+        if (args.length > 1) {
+            String dbPath = args[0];
+            String textPath = args[1];
+            System.out.printf("Testing chain generation.%ndbPath = \"%s\"%ntextPath = \"%s\"%n%n", dbPath, textPath);
+            testChainGen(dbPath, textPath);
+        }
+        else if (args.length > 0){
+            String dbPath = args[0];
+            System.out.printf("Testing database loading.%ndbpath = \"%s\"%n%n", dbPath);
+            testDBLoad(dbPath);
+        }
     }
 
-    public static void testDBLoad(){
+    public static void testDBLoad(String dbPath){
         long startTime = System.nanoTime();
-        MarkovChain markov = new MarkovChain();
+        MarkovChain markov = new MarkovChain(dbPath);
         long endTime = System.nanoTime();
         System.out.printf("Time to load DB info: %f%n", (endTime - startTime) / 10e9);
 
@@ -44,14 +53,14 @@ class MarkovTest {
         System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 10e9);
     }
 
-    public static void testChainGen(){
-        MarkovChain markov = new MarkovChain();
+    public static void testChainGen(String dbPath, String textPath){
+        MarkovChain markov = new MarkovChain(dbPath);
 
         StringBuilder testString = new StringBuilder();
 
         long startTime = System.nanoTime();
         try{
-            BufferedReader br = new BufferedReader(new FileReader("./resources/prideandprejudice.txt"));
+            BufferedReader br = new BufferedReader(new FileReader(textPath));
 
             String contentLine = br.readLine();
             while (contentLine != null){
