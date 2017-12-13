@@ -7,9 +7,6 @@ public class DataLogger {
     private ArrayList<LogItem> newItems = new ArrayList<>();
     private ArrayList<String> newWords = new ArrayList<>();
 
-    private ArrayList<LogItem> loadedItems = new ArrayList<>();
-    private ArrayList<String> loadedWords = new ArrayList<>();
-
     private SQLiteConnection sqlConn;
 
     public DataLogger(){
@@ -19,6 +16,10 @@ public class DataLogger {
         catch (SQLException e){
             System.err.printf("Error creating database: %s%n", e);
         }
+    }
+
+    public void dbExists(){
+
     }
 
     public void saveToDisk(){
@@ -40,10 +41,8 @@ public class DataLogger {
         newItems.clear();
     }
 
-    public void loadFromDisk(){
-//        try{
-//            sqlConn.loadWords
-//        }
+    public ArrayList<LogItem> loadLogItems(){
+        return sqlConn.loadLogItems();
     }
 
     public void addWord(String word){

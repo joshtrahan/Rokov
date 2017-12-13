@@ -71,14 +71,6 @@ public class SQLiteConnection {
         }
     }
 
-    public ArrayList<String> loadWords(){
-        ArrayList<String> loadedWords = new ArrayList<>(idToStringMap.size());
-        for (String word : idToStringMap.values()){
-            loadedWords.add(word);
-        }
-        return loadedWords;
-    }
-
     public ArrayList<LogItem> loadLogItems(){
         ArrayList<LogItem> logItems = new ArrayList<>();
         for (Map.Entry<Integer, HashMap<Integer, Integer>> preMap : this.relationMap.entrySet()){

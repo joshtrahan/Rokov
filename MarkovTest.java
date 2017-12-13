@@ -25,26 +25,23 @@ import java.sql.SQLException;
 
 class MarkovTest {
     public static void main(String[] args){
-        testChainGen();
-
-//        testDBGen();
-
+//        testChainGen();
         testDBLoad();
     }
 
     public static void testDBLoad(){
+        long startTime = System.nanoTime();
         MarkovChain markov = new MarkovChain();
+        long endTime = System.nanoTime();
+        System.out.printf("Time to load DB info: %f%n", (endTime - startTime) / 10e9);
 
-
-    }
-
-    public static void testDBGen(){
-        try {
-            SQLiteConnection connection = new SQLiteConnection("./resources/chain.db");
+        startTime = System.nanoTime();
+        int repetitions = 10;
+        for (int i = 0; i < repetitions; i++){
+            System.out.println(markov.generateString());
         }
-        catch (SQLException e){
-            System.out.printf("SQL Error: %s%n", e);
-        }
+        endTime = System.nanoTime();
+        System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 10e9);
     }
 
     public static void testChainGen(){
@@ -82,7 +79,7 @@ class MarkovTest {
         startTime = System.nanoTime();
         int repetitions = 10;
         for (int i = 0; i < repetitions; i++){
-            markov.generateString();
+            System.out.println(markov.generateString());
         }
         endTime = System.nanoTime();
         System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 10e9);
