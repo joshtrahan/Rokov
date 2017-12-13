@@ -17,11 +17,9 @@
  */
 
 import com.robut.markov.MarkovChain;
-import com.robut.markov.SQLiteConnection;
 
 import java.io.*;
 import java.lang.StringBuilder;
-import java.sql.SQLException;
 
 class MarkovTest {
     public static void main(String[] args){
