@@ -28,6 +28,14 @@ class MarkovTest {
         testChainGen();
 
 //        testDBGen();
+
+        testDBLoad();
+    }
+
+    public static void testDBLoad(){
+        MarkovChain markov = new MarkovChain();
+
+
     }
 
     public static void testDBGen(){

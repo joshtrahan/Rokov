@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class SQLiteConnection {
     private static final String SQLITE_PREFIX = "jdbc:sqlite:";
@@ -42,6 +43,7 @@ public class SQLiteConnection {
     public void connectDB() throws SQLException{
         Statement statement = this.conn.createStatement();
 
+        // load up word/id mapping
         ResultSet results = statement.executeQuery("SELECT id, word FROM WordIDs WHERE word IS NOT NULL");
 
         while (results.next()){
@@ -53,8 +55,43 @@ public class SQLiteConnection {
                 this.currentWordId = id;
             }
         }
+        this.currentWordId += 1;
 
+        // load up word relations
         results = statement.executeQuery("SELECT preID, postID, count FROM WordRelations");
+        while (results.next()){
+            int preID = results.getInt("preID");
+            int postID = results.getInt("postID");
+            int count = results.getInt("count");
+
+            if (!this.relationMap.containsKey(preID)){
+                this.relationMap.put(preID, new HashMap<>());
+            }
+            this.relationMap.get(preID).put(postID, count);
+        }
+    }
+
+    public ArrayList<String> loadWords(){
+        ArrayList<String> loadedWords = new ArrayList<>(idToStringMap.size());
+        for (String word : idToStringMap.values()){
+            loadedWords.add(word);
+        }
+        return loadedWords;
+    }
+
+    public ArrayList<LogItem> loadLogItems(){
+        ArrayList<LogItem> logItems = new ArrayList<>();
+        for (Map.Entry<Integer, HashMap<Integer, Integer>> preMap : this.relationMap.entrySet()){
+            String pre = this.idToStringMap.get(preMap.getKey());
+            HashMap<Integer, Integer> postMaps = preMap.getValue();
+            for (Map.Entry<Integer, Integer> postMap : postMaps.entrySet()){
+                String post = this.idToStringMap.get(postMap.getKey());
+                int count = postMap.getValue();
+                logItems.add(new LogItem(pre, post, count));
+            }
+        }
+
+        return logItems;
     }
 
     public void saveWords(ArrayList<String> words) throws SQLException {
@@ -118,6 +155,9 @@ public class SQLiteConnection {
         if (!(this.relationMap.containsKey(preID))){
             this.relationMap.put(preID, new HashMap<>());
         }
+
+// can probably change this to check for containsKey, add to count, then take the insertStatement calls
+// out of the if blocks
         if (!this.relationMap.get(preID).containsKey(postID)){
             this.relationMap.get(preID).put(postID, count);
             insertStatement.setInt(1, preID);
