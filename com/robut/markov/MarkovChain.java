@@ -18,7 +18,6 @@
 
 package com.robut.markov;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.lang.StringBuilder;
 
@@ -68,10 +67,10 @@ public class MarkovChain {
         }
 
         if (lastWord == null) {
-            this.startTree.addToken(token);
+            this.startTree.addToken(token, count);
         }
         else{
-            this.tokenTreeMap.get(lastWord).addToken(token);
+            this.tokenTreeMap.get(lastWord).addToken(token, count);
         }
         logger.addItem(lastWord, token.getValue(), count);
     }
@@ -98,7 +97,7 @@ public class MarkovChain {
         return partialString.toString();
     }
 
-    public void loadFromDisk(){
+    private void loadFromDisk(){
         for (LogItem item : logger.loadLogItems()){
             addWord(item.getSuccessor(), item.getPredecessor(), item.getCount());
         }
