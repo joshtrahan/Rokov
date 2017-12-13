@@ -2,11 +2,7 @@ package com.robut.markov;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,6 +13,7 @@ public class SQLiteConnection {
     private Connection conn;
 
     private HashMap<String, Integer> stringToIdMap = new HashMap<>();
+    private HashMap<Integer, String> idToStringMap = new HashMap<>();
     private int currentWordId = 2;
 
     private HashMap<Integer, HashMap<Integer, Integer>> relationMap = new HashMap<>();
@@ -31,10 +28,33 @@ public class SQLiteConnection {
             return;
         }
 
-        if (!filepath.exists()) {
+        if (filepath.exists()){
+            this.conn = DriverManager.getConnection(this.url);
+            connectDB();
+        }
+        else {
             this.conn = DriverManager.getConnection(this.url);
             createDB();
         }
+
+    }
+
+    public void connectDB() throws SQLException{
+        Statement statement = this.conn.createStatement();
+
+        ResultSet results = statement.executeQuery("SELECT id, word FROM WordIDs WHERE word IS NOT NULL");
+
+        while (results.next()){
+            String word = results.getString("word");
+            int id = results.getInt("id");
+            this.stringToIdMap.put(word, id);
+            this.idToStringMap.put(id, word);
+            if (this.currentWordId < id){
+                this.currentWordId = id;
+            }
+        }
+
+        results = statement.executeQuery("SELECT preID, postID, count FROM WordRelations");
     }
 
     public void saveWords(ArrayList<String> words) throws SQLException {

@@ -7,6 +7,9 @@ public class DataLogger {
     private ArrayList<LogItem> newItems = new ArrayList<>();
     private ArrayList<String> newWords = new ArrayList<>();
 
+    private ArrayList<LogItem> loadedItems = new ArrayList<>();
+    private ArrayList<String> loadedWords = new ArrayList<>();
+
     private SQLiteConnection sqlConn;
 
     public DataLogger(){
@@ -37,8 +40,10 @@ public class DataLogger {
         newItems.clear();
     }
 
-    public void addItem(String predecessor, String successor){
-        addItem(predecessor, successor, 1);
+    public void loadFromDisk(){
+//        try{
+//            sqlConn.loadWords
+//        }
     }
 
     public void addWord(String word){

@@ -42,7 +42,6 @@ public class MarkovChain {
                 this.addWord(word.replaceAll("\\s+", ""));
             }
             this.endString();
-//            logger.saveToDisk();
         }
     }
 
@@ -59,7 +58,9 @@ public class MarkovChain {
     private void addToken(Token token, String lastWord, int count) {
         if (!this.tokenTreeMap.containsKey(token.getValue())) {
             this.tokenTreeMap.put(token.getValue(), new TokenTree());
-            logger.addWord(token.getValue());
+            if (!token.isEnd()) {
+                logger.addWord(token.getValue());
+            }
         }
 
         if (lastWord == null) {
