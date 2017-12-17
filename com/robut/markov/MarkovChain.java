@@ -28,29 +28,71 @@ public class MarkovChain {
     private TokenTree startTree = new TokenTree();
     private HashMap<String, TokenTree> tokenTreeMap = new HashMap<>();
 
+    private DataLogger logger;
+
     private String lastValue;
 
     public MarkovChain(){
 
     }
 
+    public MarkovChain(String dbPath){
+        logger = new DataLogger(dbPath);
+
+        loadFromDisk();
+    }
+
     public void parseString(String toParse) {
         if (!toParse.matches("\\s+")) {
             for (String word : toParse.split("\\s+")) {
-                this.addWord(word);
+                this.addWord(word.replaceAll("\\s+", ""));
             }
             this.endString();
         }
     }
 
     public void addWord(String word){
-        Token newToken = new Token(word.intern());
-        this.addToken(newToken);
+        addWord(word, this.lastValue, 1);
+        this.lastValue = word;
+    }
+
+    private void addWord(String word, String last, int count){
+        if (word != null) {
+            word = word.intern();
+        }
+        Token newToken = new Token(word);
+        this.addToken(newToken, last, count);
+    }
+
+    private void addToken(Token token, String lastWord, int count) {
+        if (!this.tokenTreeMap.containsKey(token.getValue())) {
+            this.tokenTreeMap.put(token.getValue(), new TokenTree());
+            if (!token.isEnd()) {
+                if (logger != null) {
+                    logger.addWord(token.getValue());
+                }
+            }
+        }
+
+        if (lastWord == null) {
+            this.startTree.addToken(token, count);
+        }
+        else{
+            this.tokenTreeMap.get(lastWord).addToken(token, count);
+        }
+        if (logger != null) {
+            logger.addItem(lastWord, token.getValue(), count);
+        }
+    }
+
+    private void addToken(Token token){
+        addToken(token, this.lastValue, 1);
     }
 
     public void endString(){
         Token newToken = new Token(null);
         this.addToken(newToken);
+        this.lastValue = null;
     }
 
     public String generateString(){
@@ -65,22 +107,24 @@ public class MarkovChain {
         return partialString.toString();
     }
 
-    private void addToken(Token token, String lastWord) {
-        if (!this.tokenTreeMap.containsKey(token.getValue())) {
-            this.tokenTreeMap.put(token.getValue(), new TokenTree());
-        }
-
-        if (lastWord == null) {
-            this.startTree.addToken(token);
+    private void loadFromDisk(){
+        if (logger != null) {
+            for (LogItem item : logger.loadLogItems()) {
+                addWord(item.getSuccessor(), item.getPredecessor(), item.getCount());
+            }
         }
         else{
-            this.tokenTreeMap.get(lastWord).addToken(token);
+            System.err.printf("Error: Can't load from disk; no database path specified.%n");
+        }
+
+    }
+
+    public void saveToDisk(){
+        if (logger != null) {
+            logger.saveToDisk();
+        }
+        else{
+            System.err.printf("Error: Can't save to disk; no database path specified.%n");
         }
     }
-
-    private void addToken(Token token){
-        addToken(token, this.lastValue);
-        this.lastValue = token.getValue();
-    }
-
 }
