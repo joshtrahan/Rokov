@@ -29,12 +29,6 @@ public class LogItem {
         this.count = newCount;
     }
 
-    LogItem(String newPredecessor, String newSuccessor){
-        this.predecessor = newPredecessor;
-        this.successor = newSuccessor;
-        this.count = 1;
-    }
-
     public String getPredecessor(){
         return this.predecessor;
     }
