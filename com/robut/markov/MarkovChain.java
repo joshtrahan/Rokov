@@ -18,6 +18,7 @@
 
 package com.robut.markov;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.lang.StringBuilder;
 
@@ -37,7 +38,13 @@ public class MarkovChain {
     }
 
     public MarkovChain(String dbPath){
-        logger = new DataLogger(dbPath);
+        try {
+            logger = new DataLogger(dbPath);
+        }
+        catch (SQLException e){
+            System.err.printf("Error connecting to database at path %s: %s%nData will not be saved or loaded.%n%n",
+                    dbPath, e);
+        }
 
         loadFromDisk();
     }
@@ -126,5 +133,9 @@ public class MarkovChain {
         else{
             System.err.printf("Error: Can't save to disk; no database path specified.%n");
         }
+    }
+
+    public String getDBPath(){
+        return this.logger.getDBPath();
     }
 }

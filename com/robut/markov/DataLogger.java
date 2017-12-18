@@ -27,17 +27,12 @@ public class DataLogger {
 
     private SQLiteConnection sqlConn;
 
-    public DataLogger(String dbPath){
-        try{
-            this.sqlConn = new SQLiteConnection(dbPath);
-        }
-        catch (SQLException e){
-            System.err.printf("Error creating database: %s%n", e);
-        }
+    public DataLogger(String dbPath) throws SQLException{
+        this.sqlConn = new SQLiteConnection(dbPath);
     }
 
-    public void dbExists(){
-
+    public String getDBPath(){
+        return this.sqlConn.getDBPath();
     }
 
     public void saveToDisk(){

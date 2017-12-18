@@ -89,6 +89,10 @@ public class SQLiteConnection {
         }
     }
 
+    public String getDBPath(){
+        return this.url;
+    }
+
     public ArrayList<LogItem> loadLogItems(){
         ArrayList<LogItem> logItems = new ArrayList<>();
         for (Map.Entry<Integer, HashMap<Integer, Integer>> preMap : this.relationMap.entrySet()){
@@ -227,4 +231,5 @@ public class SQLiteConnection {
         statement.execute(createIdMapSql);
         statement.execute(createWordRelationSql);
     }
+
 }
