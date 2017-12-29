@@ -18,7 +18,8 @@
 
 import com.robut.markov.MarkovChain;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.lang.StringBuilder;
 
 class MarkovTest {
@@ -26,7 +27,7 @@ class MarkovTest {
         if (args.length > 1) {
             String dbPath = args[0];
             String textPath = args[1];
-            System.out.printf("Testing chain generation.%ndbPath = \"%s\"%ntextPath = \"%s\"%n%n", dbPath, textPath);
+            System.out.printf(".%ndbPath = \"%s\"%ntextPath = \"%s\"%n%n", dbPath, textPath);
             testChainGen(dbPath, textPath);
         }
         else if (args.length > 0){
