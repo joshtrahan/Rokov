@@ -20,15 +20,22 @@ package com.robut.markov;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class DataLogger {
-    private ArrayList<LogItem> newItems = new ArrayList<>();
-    private ArrayList<String> newWords = new ArrayList<>();
+    private ConcurrentLinkedQueue<LogItem> newItems = new ConcurrentLinkedQueue<>();
+    private ConcurrentLinkedQueue<String> newWords = new ConcurrentLinkedQueue<>();
 
     private SQLiteConnection sqlConn;
+    private Thread sqlThread;
 
     public DataLogger(String dbPath) throws SQLException{
-        this.sqlConn = new SQLiteConnection(dbPath);
+        this.sqlConn = new SQLiteConnection(dbPath, newWords, newItems);
+
+        sqlThread = new Thread(this.sqlConn);
+        sqlThread.setDaemon(false);
+
+        setupShutdownHook();
     }
 
     public String getDBPath(){
@@ -36,22 +43,10 @@ public class DataLogger {
     }
 
     public void saveToDisk(){
-        try {
-            sqlConn.saveWords(newWords);
-        }
-        catch(SQLException e){
-            System.err.printf("Error saving wordlist: %s%n", e);
-        }
+        sqlThread.start();
+        sqlThread = new Thread(this.sqlConn);
+        sqlThread.setDaemon(false);
 
-        try{
-            sqlConn.saveLogItems(newItems);
-        }
-        catch(SQLException e){
-            System.err.printf("Error saving log items: %s%n", e);
-        }
-
-        newWords.clear();
-        newItems.clear();
     }
 
     public ArrayList<LogItem> loadLogItems(){
@@ -59,10 +54,29 @@ public class DataLogger {
     }
 
     public void addWord(String word){
-        newWords.add(word);
+        newWords.offer(word);
     }
 
     public void addItem(String predecessor, String successor, int count){
-        newItems.add(new LogItem(predecessor, successor, count));
+        newItems.offer(new LogItem(predecessor, successor, count));
+    }
+
+    private void setupShutdownHook(){
+        Runtime.getRuntime().addShutdownHook(new Thread()
+        {
+            @Override
+            public void run(){
+                if (sqlThread.isAlive()){
+                    try {
+                        System.out.printf("Waiting for write to finish on database: %s%n", sqlConn.getDBPath());
+                        sqlThread.join();
+                    }
+                    catch (InterruptedException e){
+                        System.err.printf("Exception waiting for DB write to finish: %s%n", e);
+                        System.err.printf("Check for corruption in database: %s.%n", sqlConn.getDBPath());
+                    }
+                }
+            }
+        });
     }
 }

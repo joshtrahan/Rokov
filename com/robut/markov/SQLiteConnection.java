@@ -24,8 +24,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SQLiteConnection {
+public class SQLiteConnection implements Runnable {
     private static final String SQLITE_PREFIX = "jdbc:sqlite:";
 
     private String url;
@@ -37,7 +38,11 @@ public class SQLiteConnection {
 
     private HashMap<Integer, HashMap<Integer, Integer>> relationMap = new HashMap<>();
 
-    public SQLiteConnection(String dbPath) throws SQLException{
+    private ConcurrentLinkedQueue<String> wordsToSave;
+    private ConcurrentLinkedQueue<LogItem> itemsToSave;
+
+    public SQLiteConnection(String dbPath, ConcurrentLinkedQueue<String> wordQueue,
+                            ConcurrentLinkedQueue<LogItem> itemQueue) throws SQLException{
         File filepath = new File(dbPath);
         try {
             this.url = this.SQLITE_PREFIX + filepath.getCanonicalPath();
@@ -56,6 +61,26 @@ public class SQLiteConnection {
             createDB();
         }
 
+        this.wordsToSave = wordQueue;
+        this.itemsToSave = itemQueue;
+    }
+
+
+
+    public void run(){
+        try {
+            saveWords(this.wordsToSave);
+        }
+        catch(SQLException e){
+            System.err.printf("Error saving wordlist: %s%n", e);
+        }
+
+        try{
+            saveLogItems(this.itemsToSave);
+        }
+        catch(SQLException e){
+            System.err.printf("Error saving log items: %s%n", e);
+        }
     }
 
     public void connectDB() throws SQLException{
@@ -108,11 +133,16 @@ public class SQLiteConnection {
         return logItems;
     }
 
-    public void saveWords(ArrayList<String> words) throws SQLException {
+    public void saveWords(ConcurrentLinkedQueue<String> words) throws SQLException {
         this.conn.setAutoCommit(false);
         PreparedStatement prepStatement = this.conn.prepareStatement("INSERT INTO WordIDs (id, word) VALUES (?, ?)");
 
-        for (String word : words){
+        while (!words.isEmpty()){
+            String word = words.poll();
+            if (word == null){
+                break;
+            }
+
             addWordToBatch(word, prepStatement);
         }
 
@@ -131,14 +161,19 @@ public class SQLiteConnection {
         this.currentWordId = this.currentWordId + 1;
     }
 
-    public void saveLogItems(ArrayList<LogItem> items) throws SQLException{
+    public void saveLogItems(ConcurrentLinkedQueue<LogItem> items) throws SQLException{
         this.conn.setAutoCommit(false);
         PreparedStatement insertStatement = this.conn.prepareStatement("INSERT INTO WordRelations (preID, postID, count) VALUES (?, ?, ?)");
         PreparedStatement updateStatement = this.conn.prepareStatement("UPDATE WordRelations \n" +
                 "SET count = ? \n" +
                 "WHERE preID = ? AND postID = ?");
 
-        for (LogItem item : items){
+        while (!items.isEmpty()){
+            LogItem item = items.poll();
+            if (item == null){
+                break;
+            }
+
             addLogItemToBatch(item.getPredecessor(), item.getSuccessor(), item.getCount(), insertStatement, updateStatement);
         }
 
@@ -148,7 +183,8 @@ public class SQLiteConnection {
         this.conn.setAutoCommit(true);
     }
 
-    private void addLogItemToBatch(String pre, String post, int count, PreparedStatement insertStatement, PreparedStatement updateStatement) throws SQLException{
+    private void addLogItemToBatch(String pre, String post, int count, PreparedStatement insertStatement,
+                                   PreparedStatement updateStatement) throws SQLException{
         int preID;
         int postID;
 
