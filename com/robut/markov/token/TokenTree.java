@@ -52,6 +52,10 @@ public class TokenTree {
         return tokenTree.get(currentIndex).getToken();
     }
 
+    public boolean isEmpty(){
+        return this.tokenTree.isEmpty();
+    }
+
     public void addToken(Token token, int count){
         if (this.indexMap.containsKey(token.getValue())) {
             this.updateTreeValues(this.indexMap.get(token.getValue()), count);

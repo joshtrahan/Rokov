@@ -32,9 +32,6 @@ public class DataLogger {
     public DataLogger(String dbPath) throws SQLException{
         this.sqlConn = new SQLiteConnection(dbPath, newWords, newItems);
 
-        sqlThread = new Thread(this.sqlConn);
-        sqlThread.setDaemon(false);
-
         setupShutdownHook();
     }
 
@@ -43,10 +40,18 @@ public class DataLogger {
     }
 
     public void saveToDisk(){
-        sqlThread.start();
+        if (sqlThread != null && sqlThread.isAlive()) {
+            try {
+                sqlThread.join();
+            } catch (InterruptedException e) {
+                System.err.printf("Interrupt exception joining previous DB write thread: %s%n", e);
+                System.err.printf("Aboring write operation. No data has been lost unless something crazy happened.");
+                return;
+            }
+        }
         sqlThread = new Thread(this.sqlConn);
         sqlThread.setDaemon(false);
-
+        sqlThread.start();
     }
 
     public ArrayList<LogItem> loadLogItems(){
@@ -66,7 +71,7 @@ public class DataLogger {
         {
             @Override
             public void run(){
-                if (sqlThread.isAlive()){
+                if (sqlThread != null && sqlThread.isAlive()){
                     try {
                         System.out.printf("Waiting for write to finish on database: %s%n", sqlConn.getDBPath());
                         sqlThread.join();

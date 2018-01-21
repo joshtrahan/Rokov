@@ -103,6 +103,10 @@ public class MarkovChain {
     }
 
     public String generateString(){
+        if (startTree.isEmpty()){
+            return "";
+        }
+
         StringBuilder partialString = new StringBuilder();
         Token currentToken = startTree.getRandomValue();
 
