@@ -49,7 +49,7 @@ public class MarkovChain {
         loadFromDisk();
     }
 
-    public void parseString(String toParse) {
+    public synchronized void parseString(String toParse) {
         if (!toParse.matches("\\s+")) {
             for (String word : toParse.split("\\s+")) {
                 this.addWord(word.replaceAll("\\s+", ""));
