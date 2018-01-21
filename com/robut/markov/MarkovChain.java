@@ -58,12 +58,12 @@ public class MarkovChain {
         }
     }
 
-    public void addWord(String word){
+    public synchronized void addWord(String word){
         addWord(word, this.lastValue, 1);
         this.lastValue = word;
     }
 
-    private void addWord(String word, String last, int count){
+    private synchronized void addWord(String word, String last, int count){
         if (word != null) {
             word = word.intern();
         }
@@ -71,7 +71,7 @@ public class MarkovChain {
         this.addToken(newToken, last, count);
     }
 
-    private void addToken(Token token, String lastWord, int count) {
+    private synchronized void addToken(Token token, String lastWord, int count) {
         if (!this.tokenTreeMap.containsKey(token.getValue())) {
             this.tokenTreeMap.put(token.getValue(), new TokenTree());
             if (!token.isEnd()) {
@@ -92,17 +92,17 @@ public class MarkovChain {
         }
     }
 
-    private void addToken(Token token){
+    private synchronized void addToken(Token token){
         addToken(token, this.lastValue, 1);
     }
 
-    public void endString(){
+    public synchronized void endString(){
         Token newToken = new Token(null);
         this.addToken(newToken);
         this.lastValue = null;
     }
 
-    public String generateString(){
+    public synchronized String generateString(){
         if (startTree.isEmpty()){
             return "";
         }
@@ -118,7 +118,7 @@ public class MarkovChain {
         return partialString.toString();
     }
 
-    private void loadFromDisk(){
+    private synchronized void loadFromDisk(){
         if (logger != null) {
             for (LogItem item : logger.loadLogItems()) {
                 addWord(item.getSuccessor(), item.getPredecessor(), item.getCount());
@@ -130,7 +130,7 @@ public class MarkovChain {
 
     }
 
-    public void saveToDisk(){
+    public synchronized void saveToDisk(){
         if (logger != null) {
             logger.saveToDisk();
         }
