@@ -43,7 +43,11 @@ public class SQLiteConnection implements Runnable {
 
     public SQLiteConnection(String dbPath, ConcurrentLinkedQueue<String> wordQueue,
                             ConcurrentLinkedQueue<LogItem> itemQueue) throws SQLException{
-        File filepath = new File(dbPath);
+        this(new File(dbPath), wordQueue, itemQueue);
+    }
+
+    public SQLiteConnection(File filepath, ConcurrentLinkedQueue<String> wordQueue,
+                            ConcurrentLinkedQueue<LogItem> itemQueue) throws SQLException{
         try {
             this.url = this.SQLITE_PREFIX + filepath.getCanonicalPath();
         }
@@ -64,8 +68,6 @@ public class SQLiteConnection implements Runnable {
         this.wordsToSave = wordQueue;
         this.itemsToSave = itemQueue;
     }
-
-
 
     public void run(){
         try {
