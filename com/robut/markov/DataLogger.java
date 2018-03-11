@@ -45,7 +45,7 @@ public class DataLogger {
                 sqlThread.join();
             } catch (InterruptedException e) {
                 System.err.printf("Interrupt exception joining previous DB write thread: %s%n", e);
-                System.err.printf("Aboring write operation. No data has been lost unless something crazy happened.");
+                System.err.printf("Aborting write operation. No data has been lost unless something crazy happened.");
                 return;
             }
         }
