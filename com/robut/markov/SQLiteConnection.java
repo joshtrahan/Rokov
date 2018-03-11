@@ -120,7 +120,7 @@ public class SQLiteConnection implements Runnable {
         return this.url;
     }
 
-    public ArrayList<LogItem> loadLogItems(){
+    public synchronized ArrayList<LogItem> loadLogItems(){
         ArrayList<LogItem> logItems = new ArrayList<>();
         for (Map.Entry<Integer, HashMap<Integer, Integer>> preMap : this.relationMap.entrySet()){
             String pre = this.idToStringMap.get(preMap.getKey());
@@ -135,7 +135,7 @@ public class SQLiteConnection implements Runnable {
         return logItems;
     }
 
-    public void saveWords(ConcurrentLinkedQueue<String> words) throws SQLException {
+    public synchronized void saveWords(ConcurrentLinkedQueue<String> words) throws SQLException {
         this.conn.setAutoCommit(false);
         PreparedStatement prepStatement = this.conn.prepareStatement("INSERT INTO WordIDs (id, word) VALUES (?, ?)");
 
@@ -163,7 +163,7 @@ public class SQLiteConnection implements Runnable {
         this.currentWordId = this.currentWordId + 1;
     }
 
-    public void saveLogItems(ConcurrentLinkedQueue<LogItem> items) throws SQLException{
+    public synchronized void saveLogItems(ConcurrentLinkedQueue<LogItem> items) throws SQLException{
         this.conn.setAutoCommit(false);
         PreparedStatement insertStatement = this.conn.prepareStatement("INSERT INTO WordRelations (preID, postID, count) VALUES (?, ?, ?)");
         PreparedStatement updateStatement = this.conn.prepareStatement("UPDATE WordRelations \n" +
