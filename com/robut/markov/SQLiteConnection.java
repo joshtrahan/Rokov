@@ -85,7 +85,7 @@ public class SQLiteConnection implements Runnable {
         }
     }
 
-    public void connectDB() throws SQLException{
+    public synchronized void connectDB() throws SQLException{
         Statement statement = this.conn.createStatement();
 
         // load up word/id mapping
