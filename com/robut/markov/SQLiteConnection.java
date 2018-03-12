@@ -201,7 +201,15 @@ public class SQLiteConnection implements Runnable {
             postID = 1;
         }
         else{
-            postID = stringToIdMap.get(post);
+            // why is this giving me an NPE?
+            try {
+                postID = stringToIdMap.get(post);
+            }
+            catch (NullPointerException e){
+                System.err.printf("Weird NPE: %s%n");
+                e.printStackTrace();
+                throw e;
+            }
         }
 
         if (!(this.relationMap.containsKey(preID))){
