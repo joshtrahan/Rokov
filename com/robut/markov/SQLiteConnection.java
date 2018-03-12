@@ -206,7 +206,7 @@ public class SQLiteConnection implements Runnable {
                 postID = stringToIdMap.get(post);
             }
             catch (NullPointerException e){
-                System.err.printf("Weird NPE: %s%n");
+                System.err.printf("Weird NPE: %s%n", e);
                 e.printStackTrace();
                 throw e;
             }
