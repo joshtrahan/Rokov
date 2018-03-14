@@ -33,12 +33,7 @@ public class DataLogger {
         sqlThread = new Thread(this.sqlConn);
         sqlThread.setDaemon(false);
         sqlThread.start();
-        try {
-            sqlThread.join();
-        } catch (InterruptedException e) {
-            System.err.printf("Interrupt exception joining previous DB write thread: %s%n", e);
-            return;
-        }
+        joinSqlThread();
     }
 
     public Collection<LogItem> loadFromDisk() throws SQLException {
@@ -49,22 +44,26 @@ public class DataLogger {
         return this.sqlConn.getDBPath();
     }
 
-    public void setupShutdownHook() {
+    private void setupShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread()
         {
             @Override
             public void run(){
                 if (sqlThread != null && sqlThread.isAlive()){
-                    try {
-                        System.out.printf("Waiting for write to finish on database: %s%n", sqlConn.getDBPath());
-                        sqlThread.join();
-                    }
-                    catch (InterruptedException e){
-                        System.err.printf("Exception waiting for DB write to finish: %s%n", e);
-                        System.err.printf("Check for corruption in database: %s.%n", sqlConn.getDBPath());
-                    }
+                    System.out.printf("Waiting for write to finish on database: %s%n", sqlConn.getDBPath());
+                    joinSqlThread();
                 }
             }
         });
+    }
+
+    private void joinSqlThread() {
+        try {
+            sqlThread.join();
+        }
+        catch (InterruptedException e){
+            System.err.printf("Interrupt exception joining previous DB write thread: %s%n", e);
+            return;
+        }
     }
 }
