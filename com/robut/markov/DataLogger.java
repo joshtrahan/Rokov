@@ -52,6 +52,13 @@ public class DataLogger {
         sqlThread = new Thread(this.sqlConn);
         sqlThread.setDaemon(false);
         sqlThread.start();
+        try {
+            sqlThread.join();
+        } catch (InterruptedException e) {
+            System.err.printf("Interrupt exception joining previous DB write thread: %s%n", e);
+            System.err.printf("Aborting write operation. No data has been lost unless something crazy happened.");
+            return;
+        }
     }
 
     public ArrayList<LogItem> loadLogItems(){
