@@ -76,10 +76,15 @@ class MarkovTest {
         long endTime = System.nanoTime();
         System.out.printf("Read time: %f%n", (endTime - startTime) / 10e9);
 
+        int n = 0;
         startTime = System.nanoTime();
         for (String paragraph : testString.toString().split("\n"))
         {
             markov.parseString(paragraph);
+            n++;
+            if (n % 10 == 0){
+                markov.saveToDisk();
+            }
         }
         endTime = System.nanoTime();
         System.out.printf("Load time: %f%n", (endTime - startTime) / 10e9);
