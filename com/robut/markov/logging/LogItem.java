@@ -16,24 +16,29 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.robut.markov;
+package com.robut.markov.logging;
+
+import java.util.Objects;
 
 public class LogItem {
-    private String predecessor;
-    private String successor;
+    private WordCombo words;
     private int count;
 
-    LogItem(String newPredecessor, String newSuccessor, int newCount){
-        this.predecessor = newPredecessor;
-        this.successor = newSuccessor;
+    LogItem(String newPre, String newPost, int newCount){
+        this(new WordCombo(newPre, newPost), newCount);
         this.count = newCount;
     }
 
-    public String getPredecessor(){
-        return this.predecessor;
+    LogItem(WordCombo newWords, int newCount){
+        words = newWords;
+        count = newCount;
     }
-    public String getSuccessor(){
-        return this.successor;
+
+    public String getPre(){
+        return words.getPre();
+    }
+    public String getPost(){
+        return words.getPost();
     }
     public int getCount(){
         return this.count;

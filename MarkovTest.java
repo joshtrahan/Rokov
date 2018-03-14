@@ -20,7 +20,9 @@ import com.robut.markov.MarkovChain;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.lang.StringBuilder;
+import java.sql.SQLException;
 
 class MarkovTest {
     public static void main(String[] args){
@@ -39,7 +41,19 @@ class MarkovTest {
 
     public static void testDBLoad(String dbPath){
         long startTime = System.nanoTime();
-        MarkovChain markov = new MarkovChain(dbPath);
+        MarkovChain markov;
+        try {
+            markov = new MarkovChain(dbPath);
+        }
+        catch (IOException e){
+            System.err.printf("Error loading database: %s%n", e);
+            return;
+        }
+        catch (SQLException e){
+            System.err.printf("Error loading database: %s%n", e);
+            return;
+        }
+
         long endTime = System.nanoTime();
         System.out.printf("Time to load DB info: %f%n", (endTime - startTime) / 10e9);
 
@@ -53,7 +67,18 @@ class MarkovTest {
     }
 
     public static void testChainGen(String dbPath, String textPath){
-        MarkovChain markov = new MarkovChain(dbPath);
+        MarkovChain markov;
+        try{
+            markov = new MarkovChain(dbPath);
+        }
+        catch (IOException e){
+            System.err.printf("Error creating database: %s%n", e);
+            return;
+        }
+        catch (SQLException e){
+            System.err.printf("Error creating database: %s%n", e);
+            return;
+        }
 
         StringBuilder testString = new StringBuilder();
 

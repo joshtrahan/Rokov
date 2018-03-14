@@ -18,10 +18,13 @@
 
 package com.robut.markov;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.lang.StringBuilder;
 
+import com.robut.markov.logging.DataLogger;
+import com.robut.markov.logging.LogItem;
 import com.robut.markov.token.Token;
 import com.robut.markov.token.TokenTree;
 
@@ -37,15 +40,8 @@ public class MarkovChain {
 
     }
 
-    public MarkovChain(String dbPath){
-        try {
-            logger = new DataLogger(dbPath);
-        }
-        catch (SQLException e){
-            System.err.printf("Error connecting to database at path %s: %s%nData will not be saved or loaded.%n%n",
-                    dbPath, e);
-        }
-
+    public MarkovChain(String dbPath) throws IOException, SQLException{
+        logger = new DataLogger(dbPath);
         loadFromDisk();
     }
 
@@ -60,6 +56,7 @@ public class MarkovChain {
 
     public synchronized void addWord(String word){
         addWord(word, this.lastValue, 1);
+        this.logger.addItem(this.lastValue, word, 1);
         this.lastValue = word;
     }
 
@@ -80,10 +77,12 @@ public class MarkovChain {
             this.startTree.addToken(token, count);
         }
         else{
-            this.tokenTreeMap.get(lastWord).addToken(token, count);
-        }
-        if (logger != null) {
-            logger.addItem(lastWord, token.getValue(), count);
+            try {
+                this.tokenTreeMap.get(lastWord).addToken(token, count);
+            }
+            catch (NullPointerException e){
+                System.err.printf("NPE: %s%n", e);
+            }
         }
     }
 
@@ -91,9 +90,10 @@ public class MarkovChain {
         addToken(token, this.lastValue, 1);
     }
 
-     public synchronized void endString(){
+    public synchronized void endString(){
         Token newToken = new Token(null);
         this.addToken(newToken);
+        this.logger.addItem(this.lastValue, null, 1);
         this.lastValue = null;
     }
 
@@ -113,16 +113,18 @@ public class MarkovChain {
         return partialString.toString();
     }
 
-    private void loadFromDisk(){
+    private void loadFromDisk() throws SQLException {
         if (logger != null) {
-            for (LogItem item : logger.loadLogItems()) {
-                addWord(item.getSuccessor(), item.getPredecessor(), item.getCount());
+            for (LogItem item : logger.loadFromDisk()) {
+                if (!this.tokenTreeMap.containsKey(item.getPre())){
+                    this.tokenTreeMap.put(item.getPre(), new TokenTree());
+                }
+                addWord(item.getPost(), item.getPre(), item.getCount());
             }
         }
         else{
             System.err.printf("Error: Can't load from disk; no database path specified.%n");
         }
-
     }
 
     public synchronized void saveToDisk(){
