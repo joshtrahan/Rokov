@@ -107,7 +107,7 @@ class MarkovTest {
         {
             markov.parseString(paragraph);
             n++;
-            if (n % 100 == 0){
+            if (n % 10 == 0){
                 markov.saveToDisk();
             }
         }

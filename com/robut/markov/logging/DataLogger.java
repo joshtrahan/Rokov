@@ -13,6 +13,7 @@ public class DataLogger {
 
     public DataLogger(String dbPath) throws SQLException, IOException {
         this.sqlConn = new SQLConnection(dbPath, itemsToSave);
+        setupShutdownHook();
     }
 
     public void addItem(String pre, String post, int count) {
@@ -45,16 +46,12 @@ public class DataLogger {
     }
 
     private void setupShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread()
-        {
-            @Override
-            public void run(){
-                if (sqlThread != null && sqlThread.isAlive()){
-                    System.out.printf("Waiting for write to finish on database: %s%n", sqlConn.getDBPath());
-                    joinSqlThread();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (sqlThread != null && sqlThread.isAlive()){
+                System.out.printf("Waiting for write to finish on database: %s%n", sqlConn.getDBPath());
+                joinSqlThread();
                 }
-            }
-        });
+        }));
     }
 
     private void joinSqlThread() {
