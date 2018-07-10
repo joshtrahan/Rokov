@@ -41,7 +41,7 @@ class MarkovTest {
         long startTime = System.nanoTime();
         MarkovChain markov = new MarkovChain(dbPath);
         long endTime = System.nanoTime();
-        System.out.printf("Time to load DB info: %f%n", (endTime - startTime) / 10e9);
+        System.out.printf("Time to load DB info: %f%n", (endTime - startTime) / 1e9);
 
         startTime = System.nanoTime();
         int repetitions = 10;
@@ -49,7 +49,7 @@ class MarkovTest {
             System.out.println(markov.generateString());
         }
         endTime = System.nanoTime();
-        System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 10e9);
+        System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 1e9);
     }
 
     public static void testChainGen(String dbPath, String textPath){
@@ -74,7 +74,7 @@ class MarkovTest {
             System.out.printf("Exception: %s%n", e);
         }
         long endTime = System.nanoTime();
-        System.out.printf("Read time: %f%n", (endTime - startTime) / 10e9);
+        System.out.printf("Read time: %f%n", (endTime - startTime) / 1e9);
 
         int n = 0;
         startTime = System.nanoTime();
@@ -87,7 +87,7 @@ class MarkovTest {
             n += 1;
         }
         endTime = System.nanoTime();
-        System.out.printf("Load time: %f%n", (endTime - startTime) / 10e9);
+        System.out.printf("Load time: %d%n", (endTime - startTime));
 
         startTime = System.nanoTime();
         int repetitions = 10;
@@ -95,11 +95,11 @@ class MarkovTest {
             System.out.println(markov.generateString());
         }
         endTime = System.nanoTime();
-        System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 10e9);
+        System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 1e9);
 
         startTime = System.nanoTime();
         markov.saveToDisk();
         endTime = System.nanoTime();
-        System.out.printf("Time to save to disk: %f%n", (endTime - startTime) / 10e9);
+        System.out.printf("Time to save to disk: %f%n", (endTime - startTime) / 1e9);
     }
 }
