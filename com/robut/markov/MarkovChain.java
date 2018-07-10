@@ -29,24 +29,10 @@ public class MarkovChain {
     private TokenTree startTree = new TokenTree();
     private HashMap<String, TokenTree> tokenTreeMap = new HashMap<>();
 
-    private DataLogger logger;
-
     private String lastValue;
 
     public MarkovChain(){
 
-    }
-
-    public MarkovChain(String dbPath){
-        try {
-            logger = new DataLogger(dbPath);
-        }
-        catch (SQLException e){
-            System.err.printf("Error connecting to database at path %s: %s%nData will not be saved or loaded.%n%n",
-                    dbPath, e);
-        }
-
-        loadFromDisk();
     }
 
     public synchronized void parseString(String toParse) {
@@ -74,11 +60,6 @@ public class MarkovChain {
     private synchronized void addToken(Token token, String lastWord, int count) {
         if (!this.tokenTreeMap.containsKey(token.getValue())) {
             this.tokenTreeMap.put(token.getValue(), new TokenTree());
-            if (!token.isEnd()) {
-                if (logger != null) {
-                    logger.addWord(token.getValue());
-                }
-            }
         }
 
         if (lastWord == null) {
@@ -86,9 +67,6 @@ public class MarkovChain {
         }
         else{
             this.tokenTreeMap.get(lastWord).addToken(token, count);
-        }
-        if (logger != null) {
-            logger.addItem(lastWord, token.getValue(), count);
         }
     }
 
@@ -116,30 +94,5 @@ public class MarkovChain {
         }
 
         return partialString.toString();
-    }
-
-    private synchronized void loadFromDisk(){
-        if (logger != null) {
-            for (LogItem item : logger.loadLogItems()) {
-                addWord(item.getSuccessor(), item.getPredecessor(), item.getCount());
-            }
-        }
-        else{
-            System.err.printf("Error: Can't load from disk; no database path specified.%n");
-        }
-
-    }
-
-    public synchronized void saveToDisk(){
-        if (logger != null) {
-            logger.saveToDisk();
-        }
-        else{
-            System.err.printf("Error: Can't save to disk; no database path specified.%n");
-        }
-    }
-
-    public String getDBPath(){
-        return this.logger.getDBPath();
     }
 }

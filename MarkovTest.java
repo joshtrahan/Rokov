@@ -21,54 +21,28 @@ import com.robut.markov.MarkovChain;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.StringBuilder;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 class MarkovTest {
     public static void main(String[] args){
-        if (args.length > 1) {
-            String dbPath = args[0];
-            String textPath = args[1];
-            System.out.printf(".%ndbPath = \"%s\"%ntextPath = \"%s\"%n%n", dbPath, textPath);
-            testChainGen(dbPath, textPath);
-        }
-        else if (args.length > 0){
-            String dbPath = args[0];
-            System.out.printf("Testing database loading.%ndbpath = \"%s\"%n%n", dbPath);
-            testDBLoad(dbPath);
+        if (args.length > 0){
+            String textPath = args[0];
+            System.out.printf("Testing chain generation.%ntextPath = \"%s\"%n%n", textPath);
+            testChainGen(textPath);
         }
     }
 
-    public static void testDBLoad(String dbPath){
-        long startTime = System.nanoTime();
-        MarkovChain markov = new MarkovChain(dbPath);
-        long endTime = System.nanoTime();
-        System.out.printf("Time to load DB info: %f%n", (endTime - startTime) / 1e9);
+    public static void testChainGen(String textPath){
+        MarkovChain markov = new MarkovChain();
 
-        startTime = System.nanoTime();
-        int repetitions = 10;
-        for (int i = 0; i < repetitions; i++){
-            System.out.println(markov.generateString());
-        }
-        endTime = System.nanoTime();
-        System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 1e9);
-    }
-
-    public static void testChainGen(String dbPath, String textPath){
-        MarkovChain markov = new MarkovChain(dbPath);
-
-        StringBuilder testString = new StringBuilder();
+        String testString = "";
 
         long startTime = System.nanoTime();
         try{
-            BufferedReader br = new BufferedReader(new FileReader(textPath));
-
-            String contentLine = br.readLine();
-            while (contentLine != null){
-                if ( !(contentLine.matches("\\s+") || contentLine.matches("")) ) {
-                    testString.append(contentLine);
-                    testString.append("\n");
-                }
-                contentLine = br.readLine();
-            }
+            byte[] encoded = Files.readAllBytes(Paths.get(textPath));
+            testString = new String(encoded, Charset.forName("UTF-8"));
         }
         catch (Exception e){
             System.out.printf("Exception: %s%n", e);
@@ -76,18 +50,13 @@ class MarkovTest {
         long endTime = System.nanoTime();
         System.out.printf("Read time: %f%n", (endTime - startTime) / 1e9);
 
-        int n = 0;
         startTime = System.nanoTime();
-        for (String paragraph : testString.toString().split("\n"))
+        for (String paragraph : testString.toString().split("\n\n"))
         {
-            if (n % 100 == 0){
-                markov.saveToDisk();
-            }
             markov.parseString(paragraph);
-            n += 1;
         }
         endTime = System.nanoTime();
-        System.out.printf("Load time: %d%n", (endTime - startTime));
+        System.out.printf("Load time: %f%n", (endTime - startTime) / 1e9);
 
         startTime = System.nanoTime();
         int repetitions = 10;
@@ -96,10 +65,5 @@ class MarkovTest {
         }
         endTime = System.nanoTime();
         System.out.printf("Time to gen %d messages: %f%n", repetitions, (endTime - startTime) / 1e9);
-
-        startTime = System.nanoTime();
-        markov.saveToDisk();
-        endTime = System.nanoTime();
-        System.out.printf("Time to save to disk: %f%n", (endTime - startTime) / 1e9);
     }
 }
